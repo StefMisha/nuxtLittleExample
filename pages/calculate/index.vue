@@ -1,15 +1,19 @@
 <template>
   <div class="container mx-auto px-4">
     <div class="section">
-      хай
+      <calculate-form/>
     </div>
-
   </div>
 </template>
 
 <script>
+import calculateForm from "~/components/calculate/calculate";
+
 export default {
-  name: "calculate"
+  name: "index",
+  components: {
+    calculateForm
+  }
 }
 </script>
 

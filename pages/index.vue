@@ -6,58 +6,64 @@
 
       <!--карточка-->
       <div class="flex w-full justify-center">
-        <div class="w-2/3 px-3 shadow-lg rounded">
-          <div class="flex text-2xl my-5 py-10 justify-center text-gray-600 rounded shadow shadow-md px-1.5">Конвертор валют через RUB</div>
+        <div class="w-2/5 px-3 shadow-lg rounded ">
+          <div class="flex text-2xl my-5 py-6 justify-center text-gray-600 rounded shadow shadow-md px-1.5">Конвертор
+            валют через RUB
+          </div>
 
-          <div class="flex flex-wrap">
-            <!--заменить на выбор страны и валюты из селект-->
-            <div class=" rounded mt-5 shadow-inner border">
+          <div class="flex flex-wrap flex-col">
 
+            <div class="mt-5">Конвертировать из: </div>
+            <div class="rounded mt-2 shadow-inner border w-4/5">
               <select name='currencies' v-model="formCurrency">
-                <option :value="item.Value" :title="item.Name" item.Name selected="selected"
-                        v-for="item in allValue">{{ item.Name }}
-                </option>
+                <option :value="this.rub" title="Российский рубль">Российский Рубль</option> //запарсить рус руб для вывода инфы
+                <option :value="item" :title="item.Name" selected="selected" v-for="item in allValue">{{ item.Name }} </option>
               </select>
             </div>
-            <div class="w-full my-2 mt-1">
-              <label>Конвертировать из валюты (курс к рублю в RUB): </label>
-              <input type="text" v-model="formCurrency" class="my-1 mx-1 px-1 py-1 w-full rounded border mx-auto ">
-            </div>
-            <div class="rounded my-2 shadow-inner border">
-
-              <select name='currencies' v-model="toCurrency">
-                <option :value="item.Value" :title="item.Name" selected="selected"
-                        v-for="item in allValue">{{ item.Name }}
-                </option>
-              </select>
-            </div>
-            <div class="w-full my-2">
-              <label>Конвертировать в валюту (курс к рублю в RUB): </label>
-              <input type="text" v-model="toCurrency" class="my-1 mx-1 px-1 py-1 w-full rounded border mx-auto ">
-            </div>
-            <div class="w-full my-2">
-              <label>Итого выполучите: </label>
-              <input type="text " v-model="mount" class="my-1 mx-1 px-1 py-1 w-full rounded border mx-auto ">
-            </div>
-
-            <div class="w-full flex flex-wrap my-2">
-              <label>Получите: </label>
-              <div class="flex flex-wrap text-red-700 px-2">
-                {{ result }}
+            <div class="lg:w-full mx-1 mb-2">
+              <div class="flex flex-wrap">
+                <div class="text-xs text-gray-400 flex flex-wrap">Текущий курс валюты к рублю: <p class="ml-1 text-yellow-500">{{ formCurrency.Value }}</p></div>
               </div>
             </div>
 
-            <div class="w-full mt-5 flex  mx-auto my-2.5 justify-center">
-              <button class="py-2 px-6 border text-xl rounded-lg font-semibold hover:shadow" @click="getRate">
-                Получить
-              </button>
+
+            <div class="w-full mt-2">
+              <div>Конвертировать в:</div>
             </div>
+            <div class="rounded mt-2 shadow-inner border w-4/5">
+              <select name='currencies' v-model="toCurrency">
+                <option :value="this.rub" title="Российский рубль">Российский Рубль</option>
+                <option :value="item" :title="item.Name" selected="selected" v-for="item in allValue">{{ item.Name }}</option>
+              </select>
+            </div>
+            <div class="w-full mx-1 mb-2">
+              <div class="flex flex-wrap">
+                <div class="text-xs text-gray-400 flex flex-wrap ">Текущий курс валюты к рублю: <p class="ml-1 text-yellow-500">{{ toCurrency.Value }}</p></div>
+              </div>
+            </div>
+
+            <div class="w-full my-2">
+              <label>Сколько хотите получить  {{this.fromCountry.twoCountry }}: </label>
+              <input type="text" v-model="mount" class="my-1 mx-1 px-1 py-1 w-full rounded border mx-auto ">
+            </div>
+
+            <div class="w-full flex flex-wrap my-2">
+              <label>Требуется {{ fromCountry.oneCountry }}: </label>
+              <div class="flex flex-wrap text-red-700 px-2 bg-yellow-50">
+                {{ getRate }}
+              </div>
+            </div>
+<!--{{this.fromCountry}}-->
+<!--              <div class="w-full mt-5 flex  mx-auto my-2.5 justify-center">-->
+<!--                <button class="py-2 px-6 border text-xl rounded-lg font-semibold hover:shadow" @click="setValue">-->
+
+<!--                </button>-->
+<!--              </div>-->
 
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -69,39 +75,49 @@ export default {
     return {
       allValue: '',
       Currency: '',
-      formCurrency: '', //из валюты
-      toCurrency: '', //в валюту
-      exchangeRate: '', //обменный курс
+      rub: {
+        "Name": "Российский рубль",
+        "Value": 1,
+      },
+      formCurrency: 1,
+      toCurrency: '',
       mount: 1,
-      result: '',
     }
   },
 
   mounted() {
-    return this.getAllValues()
+     this.getAllValues()
   },
-computed: {
 
-},
-
-  methods: {
-     getAllValues() {
-       this.$axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
-        .then(response => {
-          this.allValue = response.data.Valute
-
-        }).catch((e) => {
-          console.log(e)
-        })
+  computed: {
+    fromCountry() {
+      return {
+        oneCountry: this.formCurrency.Name,
+        twoCountry: this.toCurrency.Name,
+      }
     },
     getRate() {
-      const rube = 1 / this.formCurrency
-      const exchangeRate = rube * this.toCurrency
-      this.result = (exchangeRate * this.mount).toFixed(2)
+      const rube = 1 / this.formCurrency.Value
+      const exchangeRate = rube * this.toCurrency.Value
+      return (exchangeRate * this.mount).toFixed(2)
     },
+  },
 
-
+  methods: {
+    getAllValues() {
+      this.$axios.get('https://www.cbr-xml-daily.ru/daily_json.js')
+        .then(response => {
+          this.allValue = response.data.Valute
+          console.log('* Данные полученены *')
+        }).catch((e) => {
+        console.log(e)
+      })
+    },
+    // calculate() {
+    //   return this.getRate
+    // }
   }
+
 
 }
 

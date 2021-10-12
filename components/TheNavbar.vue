@@ -8,6 +8,9 @@
         <div>
           <nuxt-link class="px-2 py-2 hover:text-blue-800 font-semibold text-xl" to="/calculate">Калькулятор</nuxt-link>
         </div>
+        <div>
+          <nuxt-link class="px-2 py-2 hover:text-blue-800 font-semibold text-xl" to="/countdown">Обратный отчет</nuxt-link>
+        </div>
       </div>
     </div>
   </div>
